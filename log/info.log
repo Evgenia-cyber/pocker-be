@@ -1,0 +1,3 @@
+{"message":"{\n \"method\": \"GET\",\n \"url\": \"/\"\n}","level":"info"}
+{"message":"{\n \"method\": \"GET\",\n \"url\": \"/favicon.ico\"\n}","level":"info"}
+{"message":"{\n \"method\": \"GET\",\n \"url\": \"/\"\n}","level":"info"}
