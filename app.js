@@ -4,6 +4,10 @@ const cors = require('cors');
 const socketIo = require('socket.io')(httpServer);
 
 const logInfo = require('./middlewares/logs_handling');
+const {
+  catchAndLogErrors,
+  logError,
+} = require('./middlewares/errors_handling');
 
 const serverIsRunning = require('./middlewares/server_is_running');
 
@@ -27,5 +31,15 @@ socketIo.on('connection', (socket) => {
 });
 
 app.use('/', serverIsRunning);
+
+app.use(catchAndLogErrors);
+
+process.on('uncaughtException', (err, origin) => {
+  logError(`Uncaught exception: ${err}. Exception origin: ${origin}`);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  logError(`Unhandled Rejection at: ${promise}, reason: ${reason}`);
+});
 
 module.exports = httpServer;
