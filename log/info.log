@@ -9,3 +9,8 @@
 {"message":"{\n \"method\": \"GET\",\n \"url\": \"/\"\n}","level":"info"}
 {"message":"{\n \"errorCode\": 500,\n \"errorMessage\": \"Uncaught exception: Error: ooooops. Exception origin: uncaughtException\"\n}","level":"error"}
 {"message":"{\n \"errorCode\": 500,\n \"errorMessage\": \"Uncaught exception: Error: ooooops. Exception origin: uncaughtException\"\n}","level":"error"}
+{"message":"{\n \"method\": \"GET\",\n \"url\": \"/\"\n}","level":"info"}
+{"message":"{\n \"errorCode\": 500,\n \"errorMessage\": \"Uncaught exception: RangeError: Maximum call stack size exceeded. Exception origin: uncaughtException\"\n}","level":"error"}
+{"message":"{\n \"errorCode\": 500,\n \"errorMessage\": \"Uncaught exception: RangeError: Maximum call stack size exceeded. Exception origin: uncaughtException\"\n}","level":"error"}
+{"message":"{\n \"method\": \"GET\",\n \"url\": \"/\"\n}","level":"info"}
+{"message":"{\n \"method\": \"GET\",\n \"url\": \"/favicon.ico\"\n}","level":"info"}
