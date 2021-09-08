@@ -9,50 +9,26 @@ const {
   logError,
 } = require('./middlewares/errors_handling');
 
-const User = require('./models/User');
-
 const serverIsRunning = require('./middlewares/server_is_running');
 
-// app.use(app.json());
+const { login } = require('./controllers/login');
 
 app.use(cors());
 
 app.use(logInfo);
 
-socketIo.on('connection', (socket) => {
+socketIo.on('connection', async (socket) => {
   console.log('A user connected');
 
-  socket.on('login', ({ user, room }, callbackForError) => {
-    const { firstName, lastName, job, role } = user;
-    console.log(firstName, lastName, job, role);
-    // check, if user with this firstName and lastTame and job and role exists in room
-    const existingUser = User.findOne({
-      firstName,
-      lastName,
-      job,
-      role,
-      room,
-    });
+  socket.on('login', async ({ user, room }, callback) => {
+    console.log('socket.id', socket.id); // qA3oNINM_eNf36ldAAAD
 
-    console.log('existingUser', existingUser);
+    await login({ user, room }, callback);
 
-    if (existingUser) {
-      return callbackForError('Such user is already in the room!');
-    }
-
-    // add user to DB
-    User.create({ firstName, lastName, job, role, room });
+    console.log('socket.rooms', socket.rooms); // { 'qA3oNINM_eNf36ldAAAD' }
     // join user to room
     socket.join(room);
-    // sent notification to all users in room
-    socket
-      .in(room)
-      .emit('notification', `${firstName} ${lastName} just entered the room`);
-    // get all users in room from DB
-    const updatedUsersList = User.find({ room });
-    // sent updated list of users in this room to the client side
-    socketIo.in(room).emit('users', updatedUsersList);
-    return callbackForError();
+    console.log('socket.rooms', socket.rooms); // { 'qA3oNINM_eNf36ldAAAD', '123456789' }
   });
 
   socket.on('disconnect', () => {
