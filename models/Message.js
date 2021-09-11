@@ -14,6 +14,18 @@ const messageSchema = new Schema(
       type: String,
       required: true,
     },
+    firstName: {
+      type: String,
+      required: true,
+    },
+    lastName: {
+      type: String,
+      default: '',
+    },
+    role: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,
@@ -22,8 +34,8 @@ const messageSchema = new Schema(
 );
 
 messageSchema.statics.toResponse = (response) => {
-  const { room, userId, message } = response;
-  return { room, userId, message };
+  const { userId, message, firstName, lastName, role } = response;
+  return { userId, message, firstName, lastName, role };
 };
 
 module.exports = model('Message', messageSchema);

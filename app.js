@@ -34,7 +34,7 @@ io.on('connection', async (socket) => {
 
   socket.on('send-message', async (payload) => {
     try {
-      const response = await saveMessage(payload);
+      const response = await saveMessage(payload, 'send-message');
       io.emit('get-message', response);
     } catch (error) {
       console.log(error);
