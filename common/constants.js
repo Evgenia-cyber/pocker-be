@@ -4,7 +4,7 @@ const STATUS_CODE = {
   OK: { CODE: 200, MESSAGE: '' },
   CREATED: { CODE: 201, MESSAGE: '' },
   DELETED: { CODE: 204, MESSAGE: '' },
-  BAD_REQUEST: { CODE: 400, MESSAGE: 'Bad request' },
+  BAD_REQUEST: { CODE: 400, MESSAGE: 'Bad request. Required data: ' },
   UNAUTHORIZED: { CODE: 401, MESSAGE: 'Unauthorized' },
   FORBIDDEN: { CODE: 403, MESSAGE: 'Forbidden' },
   NOT_FOUND: { CODE: 404, MESSAGE: 'not found' },
