@@ -1,15 +1,1 @@
-[{
-  "id":1,
-  "name":"Tom",
-  "age":24
-},
-  {
-    "id":2,
-    "name":"Bob",
-    "age":27
-  },
-  {
-    "id":3,
-    "name":"Alice",
-    "age":"23"
-}]
+[{"firstName":"Dima1","lastName":"yackevit4","jobPosition":"jun","role":"gamer","room":"1"},{"firstName":"Dima23","lastName":"yackevit444","jobPosition":"jun","role":"gamer","room":"1","observer":false},{"firstName":"asd","lastName":"yackevit444","jobPosition":"jun","role":"gamer","room":"1","observer":false}]

@@ -1,0 +1,3 @@
+{"message":"{\n \"errorCode\": 500,\n \"errorMessage\": \"Unhandled Rejection at: [object Promise], reason: MongoParseError: option poker is not supported\"\n}","level":"error"}
+{"message":"{\n \"errorCode\": 500,\n \"errorMessage\": \"Unhandled Rejection at: [object Promise], reason: MongoParseError: option poker is not supported\"\n}","level":"error"}
+{"message":"{\n \"errorCode\": 500,\n \"errorMessage\": \"Unhandled Rejection at: [object Promise], reason: MongoParseError: option poker is not supported\"\n}","level":"error"}

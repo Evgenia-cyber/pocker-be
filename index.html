@@ -9,14 +9,25 @@
 <body>
 <h2>Список пользователей</h2>
 <form name="userForm">
-    <input type="hidden" name="id" value="0" />
     <div class="form-group">
-        <label for="name">Имя:</label>
-        <input class="form-control" name="name" />
+        <label for="firstName">firstName:</label>
+        <input class="form-control" name="firstName" />
     </div>
     <div class="form-group">
-        <label for="age">Возраст:</label>
-        <input class="form-control" name="age" />
+        <label for="lastName">LastName:</label>
+        <input class="form-control" name="lastName" />
+    </div>
+    <div class="form-group">
+        <label for="jobPosition">jobPosition:</label>
+        <input class="form-control" name="jobPosition" />
+    </div>
+    <div class="form-group">
+        <label for="role">role:</label>
+        <input class="form-control" name="role" />
+    </div>
+    <div class="form-group">
+        <label for="room">room:</label>
+        <input class="form-control" name="room" />
     </div>
     <div class="panel-body">
         <button type="submit" class="btn btn-sm btn-primary">Сохранить</button>
@@ -24,7 +35,15 @@
     </div>
 </form>
 <table class="table table-condensed table-striped table-bordered">
-    <thead><tr><th>Id</th><th>Имя</th><th>возраст</th><th></th></tr></thead>
+    <thead>
+        <tr>
+            <th>FirstName</th>
+            <th>LastName</th>
+            <th>JobPosition</th>
+            <th>role</th>
+            <th>room</th>
+        </tr>
+    </thead>
     <tbody>
     </tbody>
 </table>
@@ -41,6 +60,7 @@
         if (response.ok === true) {
             // получаем данные
             const users = await response.json();
+            console.log(users);
             let rows = document.querySelector("tbody");
             users.forEach(user => {
                 // добавляем полученные элементы в таблицу
@@ -49,28 +69,33 @@
         }
     }
     // Получение одного пользователя
-    async function GetUser(id) {
-        const response = await fetch("/api/users/" + id, {
+    async function GetUser(lastName) {
+        const response = await fetch("/api/users/" + lastName, {
             method: "GET",
             headers: { "Accept": "application/json" }
         });
         if (response.ok === true) {
             const user = await response.json();
             const form = document.forms["userForm"];
-            form.elements["id"].value = user.id;
-            form.elements["name"].value = user.name;
-            form.elements["age"].value = user.age;
+            form.elements["fisrtName"].value = user.fisrtName;
+            form.elements["lastName"].value = user.lastName;
+            form.elements["jobPosition"].value = user.jobPosition;
+            form.elements["role"].value = user.role;
+            form.elements["room"].value = user.room;
         }
     }
     // Добавление пользователя
-    async function CreateUser(userName, userAge) {
+    async function CreateUser(firstName, lastName, jobPosition, role, room) {
 
         const response = await fetch("api/users", {
             method: "POST",
             headers: { "Accept": "application/json", "Content-Type": "application/json" },
             body: JSON.stringify({
-                name: userName,
-                age: parseInt(userAge, 10)
+                firstName: firstName,
+                lastName: lastName,
+                jobPosition: jobPosition,
+                role: role,
+                room: room
             })
         });
         if (response.ok === true) {
@@ -80,31 +105,33 @@
         }
     }
     // Изменение пользователя
-    async function EditUser(userId, userName, userAge) {
+    async function EditUser(firstName, lastName, jobPosition, role, room) {
         const response = await fetch("api/users", {
             method: "PUT",
             headers: { "Accept": "application/json", "Content-Type": "application/json" },
             body: JSON.stringify({
-                id: userId,
-                name: userName,
-                age: parseInt(userAge, 10)
+                firstName: firstName,
+                lastName: lastName,
+                jobPosition: jobPosition,
+                role: role,
+                room: room
             })
         });
         if (response.ok === true) {
             const user = await response.json();
             reset();
-            document.querySelector("tr[data-rowid='" + user.id + "']").replaceWith(row(user));
+            document.querySelector("tr[data-rowid='" + user.lastName + "']").replaceWith(row(user));
         }
     }
     // Удаление пользователя
-    async function DeleteUser(id) {
-        const response = await fetch("/api/users/" + id, {
+    async function DeleteUser(lastName) {
+        const response = await fetch("/api/users/" + lastName, {
             method: "DELETE",
             headers: { "Accept": "application/json" }
         });
         if (response.ok === true) {
             const user = await response.json();
-            document.querySelector("tr[data-rowid='" + user.id + "']").remove();
+            document.querySelector("tr[data-rowid='" + user.lastName + "']").remove();
         }
     }
 
@@ -112,47 +139,55 @@
     function reset() {
         const form = document.forms["userForm"];
         form.reset();
-        form.elements["id"].value = 0;
+        // form.elements["id"].value = 0;
     }
     // создание строки для таблицы
     function row(user) {
 
         const tr = document.createElement("tr");
-        tr.setAttribute("data-rowid", user.id);
+        tr.setAttribute("data-rowid", user.lastName);
 
-        const idTd = document.createElement("td");
-        idTd.append(user.id);
-        tr.append(idTd);
+        const firstNameTd = document.createElement("td");
+        firstNameTd.append(user.firstName);
+        tr.append(firstNameTd);
 
-        const nameTd = document.createElement("td");
-        nameTd.append(user.name);
-        tr.append(nameTd);
+        const lastNameTd = document.createElement("td");
+        lastNameTd.append(user.lastName);
+        tr.append(lastNameTd);
 
-        const ageTd = document.createElement("td");
-        ageTd.append(user.age);
-        tr.append(ageTd);
+        const jobPositionTd = document.createElement("td");
+        jobPositionTd.append(user.jobPosition);
+        tr.append(jobPositionTd);
+
+        const roleTd = document.createElement("td");
+        roleTd.append(user.role);
+        tr.append(roleTd);
+
+        const roomTd = document.createElement("td");
+        roomTd.append(user.room);
+        tr.append(roomTd);
 
         const linksTd = document.createElement("td");
 
         const editLink = document.createElement("a");
-        editLink.setAttribute("data-id", user.id);
+        editLink.setAttribute("data-id", user.lastName);
         editLink.setAttribute("style", "cursor:pointer;padding:15px;");
         editLink.append("Изменить");
         editLink.addEventListener("click", e => {
 
             e.preventDefault();
-            GetUser(user.id);
+            GetUser(user.lastName);
         });
         linksTd.append(editLink);
 
         const removeLink = document.createElement("a");
-        removeLink.setAttribute("data-id", user.id);
+        removeLink.setAttribute("data-id", user.lastName);
         removeLink.setAttribute("style", "cursor:pointer;padding:15px;");
         removeLink.append("Удалить");
         removeLink.addEventListener("click", e => {
 
             e.preventDefault();
-            DeleteUser(user.id);
+            DeleteUser(user.lastName);
         });
 
         linksTd.append(removeLink);
@@ -168,16 +203,29 @@
     })
 
     // отправка формы
-    document.forms["userForm"].addEventListener("submit", e => {
+    document.forms["userForm"].addEventListener("submit", async e => {
         e.preventDefault();
         const form = document.forms["userForm"];
-        const id = form.elements["id"].value;
-        const name = form.elements["name"].value;
-        const age = form.elements["age"].value;
-        if (id == 0)
-            CreateUser(name, age);
-        else
-            EditUser(id, name, age);
+        const firstName = form.elements["firstName"].value;
+        const lastName = form.elements["lastName"].value;
+        const jobPosition = form.elements["jobPosition"].value;
+        const role = form.elements["role"].value;
+        const room = form.elements["room"].value;
+
+        // отправляет запрос и получаем ответ
+        const response = await fetch("/api/users", {
+            method: "GET",
+            headers: { "Accept": "application/json" }
+        });
+        // если запрос прошел нормально
+        if (response.ok === true) {
+            // получаем данные
+            const users = await response.json();
+            if (users.find(user => user.firstName === firstName && user.lastName === lastName))
+                EditUser(firstName, lastName, jobPosition, role, room);
+            else
+                CreateUser(firstName, lastName, jobPosition, role, room);
+        }
     });
 
     // загрузка пользователей

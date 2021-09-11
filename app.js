@@ -1,7 +1,9 @@
 const express = require("express");
 const fs = require("fs");
+var cors = require('cors');
 
 const app = express();
+app.use(cors());
 const jsonParser = express.json();
 
 app.use(express.static(__dirname));
@@ -14,15 +16,16 @@ app.get("/api/users", function(req, res){
     res.send(users);
 });
 // получение одного пользователя по id
-app.get("/api/users/:id", function(req, res){
+app.get("/api/users/:lastName", function(req, res){
 
-    const id = req.params.id; // получаем id
+    const lastName = req.params.lastName; // получаем id
     const content = fs.readFileSync(filePath, "utf8");
     const users = JSON.parse(content);
+    console.log(users);
     let user = null;
     // находим в массиве пользователя по id
     for(var i=0; i<users.length; i++){
-        if(users[i].id==id){
+        if(users[i].lastName == lastName){
             user = users[i];
             break;
         }
@@ -39,35 +42,26 @@ app.get("/api/users/:id", function(req, res){
 app.post("/api/users", jsonParser, function (req, res) {
 
     if(!req.body) return res.sendStatus(400);
-
-    const userName = req.body.name;
-    const userAge = req.body.age;
-    let user = {name: userName, age: userAge};
-
+    let user = req.body;
     let data = fs.readFileSync(filePath, "utf8");
     let users = JSON.parse(data);
-
-    // находим максимальный id
-    const id = Math.max.apply(Math,users.map(function(o){return o.id;}))
-    // увеличиваем его на единицу
-    user.id = id+1;
-    // добавляем пользователя в массив
-    users.push(user);
-    data = JSON.stringify(users);
+    
+    data = JSON.stringify([...users, user]);
     // перезаписываем файл с новыми данными
     fs.writeFileSync("users.json", data);
     res.send(user);
 });
 // удаление пользователя по id
-app.delete("/api/users/:id", function(req, res){
+app.delete("/api/users/:lastName", function(req, res){
 
-    const id = req.params.id;
+    const lastName = req.params.lastName;
     let data = fs.readFileSync(filePath, "utf8");
     let users = JSON.parse(data);
     let index = -1;
+    console.log(users);
     // находим индекс пользователя в массиве
     for(var i=0; i < users.length; i++){
-        if(users[i].id==id){
+        if(users[i].lastName==lastName){
             index=i;
             break;
         }
