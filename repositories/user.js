@@ -8,4 +8,6 @@ const createUser = async (user, room) => {
   return userModel.save();
 };
 
-module.exports = { createUser };
+const deleteUser = async (userId) => User.findByIdAndRemove(userId);
+
+module.exports = { createUser, deleteUser };
