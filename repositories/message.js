@@ -6,7 +6,8 @@ const createMessage = async (
   message,
   firstName,
   lastName,
-  role
+  role,
+  type
 ) => {
   const messageModel = new Message({
     room,
@@ -15,6 +16,7 @@ const createMessage = async (
     firstName,
     lastName,
     role,
+    type,
   });
 
   return messageModel.save();

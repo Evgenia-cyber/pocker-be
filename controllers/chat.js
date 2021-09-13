@@ -4,7 +4,7 @@ const Message = require('../models/Message');
 const { createMessage } = require('../repositories/message');
 
 const saveMessage = async (
-  { room, userId, message, firstName, lastName, role },
+  { room, userId, message, firstName, lastName, role, type },
   eventName
 ) => {
   if (!room || !userId || !message || !firstName || !role) {
@@ -21,7 +21,8 @@ const saveMessage = async (
     message,
     firstName,
     lastName,
-    role
+    role,
+    type
   );
 
   return Message.toResponse(newMessage);
