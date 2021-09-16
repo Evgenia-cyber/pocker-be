@@ -10,4 +10,6 @@ const createUser = async (user, room) => {
 
 const deleteUser = async (userId) => User.findByIdAndRemove(userId);
 
-module.exports = { createUser, deleteUser };
+const getAllUsersCount = async (room) => User.countDocuments({ room });
+
+module.exports = { createUser, deleteUser, getAllUsersCount };

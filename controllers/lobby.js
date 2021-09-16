@@ -1,7 +1,10 @@
 const { STATUS_CODE } = require('../common/constants');
 const CustomError = require('../common/customError');
+const Kick = require('../models/Kick');
 const User = require('../models/User');
-const { deleteUser } = require('../repositories/user');
+const { createKick, updateKick } = require('../repositories/kick');
+const { updateChat } = require('../repositories/message');
+const { deleteUser, getAllUsersCount } = require('../repositories/user');
 
 const kickUser = async ({ room, userId }, eventName) => {
   if (!room || !userId) {
@@ -20,8 +23,47 @@ const kickUser = async ({ room, userId }, eventName) => {
       eventName
     );
   } else {
+    await updateChat(room, userId);
     return User.toResponse(kickedUser);
   }
 };
 
-module.exports = { kickUser };
+const addNewKick = async ({ room, whoWillBeKickedUserId }, eventName) => {
+  if (!room || !whoWillBeKickedUserId) {
+    throw new CustomError(
+      STATUS_CODE.BAD_REQUEST.CODE,
+      `${STATUS_CODE.BAD_REQUEST.MESSAGE} room, whoWillBeKickedUserId`,
+      eventName
+    );
+  }
+  const newKick = await createKick(room, whoWillBeKickedUserId);
+
+  return Kick.toResponse(newKick);
+};
+
+const addVoiceToKickUser = async ({ kickId }, eventName) => {
+  if (!kickId) {
+    throw new CustomError(
+      STATUS_CODE.BAD_REQUEST.CODE,
+      `${STATUS_CODE.BAD_REQUEST.MESSAGE} kickId`,
+      eventName
+    );
+  }
+  const updatedKick = await updateKick(kickId);
+
+  return Kick.toResponse(updatedKick);
+};
+
+const getUsersCount = async (room, eventName) => {
+  if (!room) {
+    throw new CustomError(
+      STATUS_CODE.BAD_REQUEST.CODE,
+      `${STATUS_CODE.BAD_REQUEST.MESSAGE} room`,
+      eventName
+    );
+  }
+
+  return getAllUsersCount(room);
+};
+
+module.exports = { kickUser, addNewKick, addVoiceToKickUser, getUsersCount };

@@ -11,4 +11,7 @@ const STATUS_CODE = {
   INTERNAL_SERVER_ERROR: { CODE: 500, MESSAGE: 'Internal server error' },
 };
 
-module.exports = { DEFAULT_PORT, STATUS_CODE };
+const KICKED_ID = 'kicked_user';
+const KICKED_BY_VOITING = 'kicked by voting';
+
+module.exports = { DEFAULT_PORT, STATUS_CODE, KICKED_ID, KICKED_BY_VOITING };
