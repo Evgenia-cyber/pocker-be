@@ -2,15 +2,15 @@ const { STATUS_CODE } = require('../common/constants');
 const logger = require('../common/logger');
 const formateJSONstringify = require('../common/utils/formateJSONstringify');
 
-// const catchError = (socket, func) => async () => {
-//   try {
-//     await func();
-//   } catch (error) {
-//     // eslint-disable-next-line no-console
-//     console.log('error', error);
-//     socket.emit('error', error);
-//   }
-// };
+const catchError = (socket, func) => async () => {
+  try {
+    await func();
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.log('error', error);
+    socket.emit('error', error);
+  }
+};
 
 const catchAndLogErrors = async (err, _req, res, next) => {
   const errorStatus = err.status
@@ -39,4 +39,4 @@ const logError = (errorMessage) => {
 };
 
 // module.exports = { catchAndLogErrors, catchError, logError };
-module.exports = { catchAndLogErrors, logError };
+module.exports = { catchAndLogErrors, logError, catchError };
