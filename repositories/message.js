@@ -1,3 +1,4 @@
+const { KICKED_ID } = require('../common/constants');
 const Message = require('../models/Message');
 
 const createMessage = async (
@@ -22,4 +23,11 @@ const createMessage = async (
   return messageModel.save();
 };
 
-module.exports = { createMessage };
+const updateChat = async (room, kickedUserId) => Message.updateMany(
+  { room, userId: kickedUserId },
+  { userId: KICKED_ID }
+);
+
+const getAll = async (room) => Message.find({ room });
+
+module.exports = { createMessage, updateChat, getAll };
