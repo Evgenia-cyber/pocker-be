@@ -1,10 +1,8 @@
 const User = require('../models/User');
 
-const createUser = async (user, room) => {
-  const { firstName, lastName, job, role } = user;
+const createUser = async (user) => {
 
-  const userModel = new User({ firstName, lastName, job, role, room });
-
+  const userModel = new User(user);
   return userModel.save();
 };
 
