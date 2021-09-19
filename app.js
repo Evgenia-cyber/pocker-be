@@ -29,15 +29,12 @@ app.use(logInfo);
 io.on('connection', async (socket) => {
   console.log('A user connected');
 
-  socket.on('login', async ({ user, room }, callback) => {
-    // console.log('socket.id', socket.id); // qA3oNINM_eNf36ldAAAD
+  socket.on('login', async (payload) => {
 
-    await login({ user, room }, callback);
+    await login(payload);
 
-    // console.log('socket.rooms', socket.rooms); // { 'qA3oNINM_eNf36ldAAAD' }
     // join user to room
-    socket.join(room);
-    // console.log('socket.rooms', socket.rooms); // { 'qA3oNINM_eNf36ldAAAD', '123456789' }
+    socket.join(payload.room);
   });
 
   // socket.on('send-message', async (payload) => {
