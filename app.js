@@ -7,7 +7,6 @@ const logInfo = require('./middlewares/logs_handling');
 const {
   catchAndLogErrors,
   logError,
-  // catchError,
 } = require('./middlewares/errors_handling');
 
 const serverIsRunning = require('./middlewares/server_is_running');
