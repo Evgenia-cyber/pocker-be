@@ -7,7 +7,6 @@ const logInfo = require('./middlewares/logs_handling');
 const {
   catchAndLogErrors,
   logError,
-  catchError,
 } = require('./middlewares/errors_handling');
 
 const serverIsRunning = require('./middlewares/server_is_running');
@@ -19,6 +18,7 @@ const {
   addNewKick,
   addVoiceToKickUser,
   getUsersCount,
+  getUsers,
 } = require('./controllers/lobby');
 const { KICKED_BY_VOITING } = require('./common/constants');
 
@@ -29,30 +29,30 @@ app.use(logInfo);
 io.on('connection', async (socket) => {
   console.log('A user connected');
 
-  socket.on('login', async (payload) => {
+  socket.on('login', async ({ user, room }, callback) => {
+    // console.log('socket.id', socket.id); // qA3oNINM_eNf36ldAAAD
 
-    await login(payload);
+    await login('login', { user, room }, callback);
+
+    console.log('socket.rooms', socket.rooms); // { 'qA3oNINM_eNf36ldAAAD' }
 
     // join user to room
-    socket.join(payload.room);
+    socket.join(room);
+
+    console.log('socket.rooms', socket.rooms); // { 'qA3oNINM_eNf36ldAAAD', '123456789' }
   });
 
-  // socket.on('send-message', async (payload) => {
-  //   try {
-  //     const response = await saveMessage(payload, 'send-message');
-  //     io.emit('get-message', response);
-  //   } catch (error) {
-  //     // eslint-disable-next-line no-console
-  //     console.log('error', error);
-  //     socket.emit('error', error);
-  //   }
-  // });
+  socket.on('get-all-users-in-room', async ({ room }, callback) => {
+    await getUsers('get-all-users-in-room', { room }, callback);
+  });
 
-  socket.on('send-message', async (payload) => {
-    catchError(socket, async () => {
-      const response = await saveMessage(payload, 'send-message');
-      io.emit('get-message', response);
-    })();
+  socket.on('get-all-chat', async (room, callback) => {
+    await getChat('get-all-chat', room, callback);
+  });
+
+  socket.on('send-message', async (message, room, callback) => {
+    const type = 'chat';
+    await saveMessage('send-message', message, type, room, callback);
   });
 
   socket.on('kick-user', async (payload) => {
