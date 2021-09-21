@@ -1,4 +1,3 @@
-
 const { STATUS_CODE } = require('../common/constants');
 const User = require('../models/User');
 const { createUser } = require('../repositories/user');
