@@ -86,33 +86,76 @@ response:
 
 ---
 
+`get-all-chat`:
+
+parameters:
+
+- room - required
+
+response:
+
+- {
+  eventName: 'get-all-chat',
+  code: 200,
+  error: '',
+  data:{
+  messages:[
+  {
+  firstName: "Jen"
+  lastName: ""
+  message: "Hi"
+  role: "user"
+  type: "chat"
+  userId: "ZwtP67cXLT-iYoXAAAAD"
+  },
+  {
+  firstName: "Evgenia"
+  lastName: ""
+  message: "Hi"
+  role: "user"
+  type: "chat"
+  userId: "Mmh8D2v3vRkXGmtAAAAD"
+  }
+  ]
+  }
+  }
+
+- errors: 400
+
+---
+
 `send-message`:
 
 parameters:
 
 - room - required
-- userId - required
-- message - required
-- firstName - required
-- role - required
-- lastName
+- message: {
+  userId,- required
+  newMessage,- required
+  firstName,- required
+  lastName,
+  role,- required
+  };
 
-responses:
-
-- {
-  userId: '11111',
-  firstName: 'Stephan',
-  lastName: 'Nazarenko',
-  role: ROLES.ADMIN,
-  message: 'Hi :)',
-  type: ''
-  }
+response:
 
 - {
-  status: 400,
-  error: 'Bad request',
-  eventName: 'send-message',
+  eventName:'send-message',
+  code: 201,
+  error: '',
+  data:{
+  user:{
+  firstName: "Evgenia"
+  lastName: ""
+  message: "Hi"
+  role: "user"
+  type: "chat"
+  userId: "Mmh8D2v3vRkXGmtAAAAD"
   }
+  }
+  }
+
+- errors: 400
 
 ---
 

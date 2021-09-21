@@ -25,6 +25,7 @@ const getUsers = async (eventName, { room }, callback) => {
   }
 
   const allUsersInRoom = await getAllUsers(room);
+
   response.code = STATUS_CODE.OK.CODE;
   response.data.users = allUsersInRoom.map((user) => User.toResponse(user));
 

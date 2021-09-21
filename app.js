@@ -7,7 +7,7 @@ const logInfo = require('./middlewares/logs_handling');
 const {
   catchAndLogErrors,
   logError,
-  catchError,
+  // catchError,
 } = require('./middlewares/errors_handling');
 
 const serverIsRunning = require('./middlewares/server_is_running');
@@ -36,8 +36,10 @@ io.on('connection', async (socket) => {
     await login('login', { user, room }, callback);
 
     console.log('socket.rooms', socket.rooms); // { 'qA3oNINM_eNf36ldAAAD' }
+
     // join user to room
     socket.join(room);
+
     console.log('socket.rooms', socket.rooms); // { 'qA3oNINM_eNf36ldAAAD', '123456789' }
   });
 
@@ -45,22 +47,13 @@ io.on('connection', async (socket) => {
     await getUsers('get-all-users-in-room', { room }, callback);
   });
 
-  // socket.on('send-message', async (payload) => {
-  //   try {
-  //     const response = await saveMessage(payload, 'send-message');
-  //     io.emit('get-message', response);
-  //   } catch (error) {
-  //     // eslint-disable-next-line no-console
-  //     console.log('error', error);
-  //     socket.emit('error', error);
-  //   }
-  // });
+  socket.on('get-all-chat', async (room, callback) => {
+    await getChat('get-all-chat', room, callback);
+  });
 
-  socket.on('send-message', async (payload) => {
-    catchError(socket, async () => {
-      const response = await saveMessage(payload, 'send-message');
-      io.emit('get-message', response);
-    })();
+  socket.on('send-message', async (message, room, callback) => {
+    const type = 'chat';
+    await saveMessage('send-message', message, type, room, callback);
   });
 
   socket.on('kick-user', async (payload) => {

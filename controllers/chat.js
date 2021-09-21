@@ -1,45 +1,65 @@
 const { STATUS_CODE } = require('../common/constants');
-const CustomError = require('../common/customError');
 const Message = require('../models/Message');
 const { createMessage, getAll } = require('../repositories/message');
 
-const saveMessage = async (
-  { room, userId, message, firstName, lastName, role, type },
-  eventName
-) => {
-  if (!room || !userId || !message || !firstName || !role) {
-    throw new CustomError(
-      STATUS_CODE.BAD_REQUEST.CODE,
-      `${STATUS_CODE.BAD_REQUEST.MESSAGE} room, userId, message, firstName, role`,
-      eventName
-    );
+const saveMessage = async (eventName, message, type, room, callback) => {
+  const response = {
+    eventName,
+    code: 0,
+    error: '',
+    data: {},
+  };
+
+  const {
+    userId,
+    newMessage: newMessageFromClient,
+    firstName,
+    lastName,
+    role,
+  } = message;
+
+  if (!room || !userId || !newMessageFromClient || !firstName || !role) {
+    response.code = STATUS_CODE.BAD_REQUEST.CODE;
+    response.error = `${STATUS_CODE.BAD_REQUEST.MESSAGE} room, userId, newMessage, firstName, role`;
+    return callback(response);
   }
 
   const newMessage = await createMessage(
     room,
     userId,
-    message,
+    newMessageFromClient,
     firstName,
     lastName,
     role,
     type
   );
 
-  return Message.toResponse(newMessage);
+  response.code = STATUS_CODE.CREATED.CODE;
+  response.data.message = Message.toResponse(newMessage);
+
+  return callback(response);
 };
 
-const getChat = async (room, eventName) => {
+const getChat = async (eventName, room, callback) => {
+  const response = {
+    eventName,
+    code: 0,
+    error: '',
+    data: {},
+  };
+
   if (!room) {
-    throw new CustomError(
-      STATUS_CODE.BAD_REQUEST.CODE,
-      `${STATUS_CODE.BAD_REQUEST.MESSAGE} room`,
-      eventName
-    );
+    response.code = STATUS_CODE.BAD_REQUEST.CODE;
+    response.error = `${STATUS_CODE.BAD_REQUEST.MESSAGE} room`;
+    return callback(response);
   }
 
   const allMessages = await getAll(room);
 
-  return allMessages.map((message) => Message.toResponse(message));
+  response.code = STATUS_CODE.OK.CODE;
+  response.data.messages = allMessages.map((message) => Message.toResponse(message));
+
+  return callback(response);
 };
 
 module.exports = { saveMessage, getChat };
