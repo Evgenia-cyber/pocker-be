@@ -2,6 +2,10 @@ const { Schema, model } = require('mongoose');
 
 const userSchema = new Schema(
   {
+    _id: {
+      type: String,
+      required: true,
+    },
     firstName: {
       type: String,
       required: true,
@@ -30,8 +34,9 @@ const userSchema = new Schema(
 );
 
 userSchema.statics.toResponse = (response) => {
-  const { userId, firstName, lastName, role, job, room } = response;
-  return { userId, firstName, lastName, role, job, room };
+  const { _id, firstName, lastName, role, job, room, socketId } = response;
+  const userId = _id.toString();
+  return { userId, firstName, lastName, role, job, room, socketId };
 };
 
 module.exports = model('User', userSchema);

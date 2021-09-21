@@ -4,7 +4,32 @@ const Kick = require('../models/Kick');
 const User = require('../models/User');
 const { createKick, updateKick } = require('../repositories/kick');
 const { updateChat } = require('../repositories/message');
-const { deleteUser, getAllUsersCount } = require('../repositories/user');
+const {
+  deleteUser,
+  getAllUsersCount,
+  getAllUsers,
+} = require('../repositories/user');
+
+const getUsers = async (eventName, { room }, callback) => {
+  const response = {
+    eventName,
+    code: 0,
+    error: '',
+    data: {},
+  };
+
+  if (!room) {
+    response.code = STATUS_CODE.BAD_REQUEST.CODE;
+    response.error = `${STATUS_CODE.BAD_REQUEST.MESSAGE} room`;
+    return callback(response);
+  }
+
+  const allUsersInRoom = await getAllUsers(room);
+  response.code = STATUS_CODE.OK.CODE;
+  response.data.users = allUsersInRoom.map((user) => User.toResponse(user));
+
+  return callback(response);
+};
 
 const kickUser = async ({ room, userId }, eventName) => {
   if (!room || !userId) {
@@ -66,4 +91,10 @@ const getUsersCount = async (room, eventName) => {
   return getAllUsersCount(room);
 };
 
-module.exports = { kickUser, addNewKick, addVoiceToKickUser, getUsersCount };
+module.exports = {
+  kickUser,
+  addNewKick,
+  addVoiceToKickUser,
+  getUsersCount,
+  getUsers,
+};

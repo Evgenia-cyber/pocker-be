@@ -19,6 +19,7 @@ const {
   addNewKick,
   addVoiceToKickUser,
   getUsersCount,
+  getUsers,
 } = require('./controllers/lobby');
 const { KICKED_BY_VOITING } = require('./common/constants');
 
@@ -32,12 +33,16 @@ io.on('connection', async (socket) => {
   socket.on('login', async ({ user, room }, callback) => {
     // console.log('socket.id', socket.id); // qA3oNINM_eNf36ldAAAD
 
-    await login({ user, room }, callback);
+    await login('login', { user, room }, callback);
 
-    // console.log('socket.rooms', socket.rooms); // { 'qA3oNINM_eNf36ldAAAD' }
+    console.log('socket.rooms', socket.rooms); // { 'qA3oNINM_eNf36ldAAAD' }
     // join user to room
     socket.join(room);
-    // console.log('socket.rooms', socket.rooms); // { 'qA3oNINM_eNf36ldAAAD', '123456789' }
+    console.log('socket.rooms', socket.rooms); // { 'qA3oNINM_eNf36ldAAAD', '123456789' }
+  });
+
+  socket.on('get-all-users-in-room', async ({ room }, callback) => {
+    await getUsers('get-all-users-in-room', { room }, callback);
   });
 
   // socket.on('send-message', async (payload) => {

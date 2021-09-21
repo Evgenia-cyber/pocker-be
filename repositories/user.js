@@ -1,9 +1,17 @@
+// const mongoose = require('mongoose');
 const User = require('../models/User');
 
 const createUser = async (user, room) => {
-  const { firstName, lastName, job, role } = user;
+  const { userId, firstName, lastName, job, role } = user;
 
-  const userModel = new User({ firstName, lastName, job, role, room });
+  const userModel = new User({
+    _id: userId,
+    firstName,
+    lastName,
+    job,
+    role,
+    room,
+  });
 
   return userModel.save();
 };
@@ -12,4 +20,6 @@ const deleteUser = async (userId) => User.findByIdAndRemove(userId);
 
 const getAllUsersCount = async (room) => User.countDocuments({ room });
 
-module.exports = { createUser, deleteUser, getAllUsersCount };
+const getAllUsers = async (room) => User.find({ room });
+
+module.exports = { createUser, deleteUser, getAllUsersCount, getAllUsers };
