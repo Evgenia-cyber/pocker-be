@@ -2,7 +2,9 @@ const { STATUS_CODE } = require('../common/constants');
 const User = require('../models/User');
 const { createUser } = require('../repositories/user');
 
+
 const login = async (eventName, { user, room }, callback) => {
+  
   const response = {
     eventName,
     code: 0,
@@ -20,7 +22,7 @@ const login = async (eventName, { user, room }, callback) => {
 
   const newUser = await createUser(user, room);
 
-  response.code = STATUS_CODE.CREATED.CODE;
+ response.code = STATUS_CODE.CREATED.CODE;
   response.data.user = User.toResponse(newUser);
 
   return callback(response);
