@@ -26,6 +26,8 @@ app.use(cors());
 
 app.use(logInfo);
 
+console.log('check work');
+
 io.on('connection', async (socket) => {
   console.log('A user connected');
 
