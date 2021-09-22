@@ -26,15 +26,26 @@ app.use(cors());
 
 app.use(logInfo);
 
-console.log('check work');
-
 io.on('connection', async (socket) => {
   console.log('A user connected');
+
+  // socket.on('login', async ({ user, room }, callback) => {
+  //   // console.log('socket.id', socket.id); // qA3oNINM_eNf36ldAAAD
+
+  //   await login('login', { user, room }, callback);
+
+  //   console.log('socket.rooms', socket.rooms); // { 'qA3oNINM_eNf36ldAAAD' }
+
+  //   // join user to room
+  //   socket.join(room);
+
+  //   console.log('socket.rooms', socket.rooms); // { 'qA3oNINM_eNf36ldAAAD', '123456789' }
+  // });
 
   socket.on('login', async ({ user, room }, callback) => {
     // console.log('socket.id', socket.id); // qA3oNINM_eNf36ldAAAD
 
-    await login('login', { user, room }, callback);
+    const resp = await login('login', { user, room });
 
     console.log('socket.rooms', socket.rooms); // { 'qA3oNINM_eNf36ldAAAD' }
 
@@ -42,6 +53,10 @@ io.on('connection', async (socket) => {
     socket.join(room);
 
     console.log('socket.rooms', socket.rooms); // { 'qA3oNINM_eNf36ldAAAD', '123456789' }
+
+    callback(resp);
+
+    socket.broadcast.to(room).emit('add-member', resp);
   });
 
   socket.on('get-all-users-in-room', async ({ room }, callback) => {
