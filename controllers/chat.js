@@ -2,7 +2,7 @@ const { STATUS_CODE } = require('../common/constants');
 const Message = require('../models/Message');
 const { createMessage, getAll } = require('../repositories/message');
 
-const saveMessage = async (eventName, message, type, room, callback) => {
+const saveMessage = async (eventName, message, type, room) => {
   const response = {
     eventName,
     code: 0,
@@ -21,7 +21,7 @@ const saveMessage = async (eventName, message, type, room, callback) => {
   if (!room || !userId || !newMessageFromClient || !firstName || !role) {
     response.code = STATUS_CODE.BAD_REQUEST.CODE;
     response.error = `${STATUS_CODE.BAD_REQUEST.MESSAGE} room, userId, newMessage, firstName, role`;
-    return callback(response);
+    return response;
   }
 
   const newMessage = await createMessage(
@@ -37,10 +37,10 @@ const saveMessage = async (eventName, message, type, room, callback) => {
   response.code = STATUS_CODE.CREATED.CODE;
   response.data.message = Message.toResponse(newMessage);
 
-  return callback(response);
+  return response;
 };
 
-const getChat = async (eventName, room, callback) => {
+const getChat = async (eventName, room) => {
   const response = {
     eventName,
     code: 0,
@@ -51,7 +51,7 @@ const getChat = async (eventName, room, callback) => {
   if (!room) {
     response.code = STATUS_CODE.BAD_REQUEST.CODE;
     response.error = `${STATUS_CODE.BAD_REQUEST.MESSAGE} room`;
-    return callback(response);
+    return response;
   }
 
   const allMessages = await getAll(room);
@@ -59,7 +59,7 @@ const getChat = async (eventName, room, callback) => {
   response.code = STATUS_CODE.OK.CODE;
   response.data.messages = allMessages.map((message) => Message.toResponse(message));
 
-  return callback(response);
+  return response;
 };
 
 module.exports = { saveMessage, getChat };
