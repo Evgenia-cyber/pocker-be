@@ -14,13 +14,14 @@ const serverIsRunning = require('./middlewares/server_is_running');
 const { login } = require('./controllers/login');
 const { saveMessage, getChat } = require('./controllers/chat');
 const {
-  kickUser,
+  // kickUser,
   addNewKick,
   addVoiceToKickUser,
   getUsersCount,
   getUsers,
 } = require('./controllers/lobby');
 const { KICKED_BY_VOITING } = require('./common/constants');
+const kickUserHandler = require('./socket_events_handlers/kick_user_handler');
 
 app.use(cors());
 
@@ -34,12 +35,13 @@ io.on('connection', async (socket) => {
 
     const resp = await login('login', { user, room });
 
-    console.log('socket.rooms', socket.rooms); // { 'qA3oNINM_eNf36ldAAAD' }
+    console.log('login', resp);
+    // console.log('socket.rooms', socket.rooms); // { 'qA3oNINM_eNf36ldAAAD' }
 
     // join user to room
     socket.join(room);
 
-    console.log('socket.rooms', socket.rooms); // { 'qA3oNINM_eNf36ldAAAD', '123456789' }
+    // console.log('socket.rooms', socket.rooms); // { 'qA3oNINM_eNf36ldAAAD', '123456789' }
 
     callback(resp);
 
@@ -47,90 +49,71 @@ io.on('connection', async (socket) => {
   });
 
   socket.on('get-all-users-in-room', async ({ room }, callback) => {
-    await getUsers('get-all-users-in-room', { room }, callback);
+    const resp = await getUsers('get-all-users-in-room', room);
+
+    console.log('get-all-users-in-room', resp);
+    callback(resp);
   });
 
   socket.on('get-all-chat', async (room, callback) => {
-    await getChat('get-all-chat', room, callback);
+    const resp = await getChat('get-all-chat', room);
+    console.log('get-all-chat', resp);
+    callback(resp);
   });
 
   socket.on('send-message', async (message, room, callback) => {
     const type = 'chat';
     const resp = await saveMessage('send-message', message, type, room);
+    console.log('send-message', resp);
 
     callback(resp);
     socket.broadcast.to(room).emit('get-message', resp);
   });
 
   socket.on('kick-user', async (payload) => {
-    try {
-      const { userId, room, message } = payload;
-      const kickedUser = await kickUser({ userId, room }, 'kick-user');
-      if (kickedUser) {
-        const { firstName, lastName, role } = kickedUser;
-        const kickMessage = {
-          room,
-          userId,
-          message,
-          firstName,
-          lastName,
-          role,
-          type: 'kick',
-        };
-        const newMessage = await saveMessage(kickMessage, 'send-message');
-        const newChat = await getChat(room, 'send-message');
-
-        io.emit('get-message', newMessage);
-        io.emit('update-chat', newChat);
-      }
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.log('error', error);
-      socket.emit('error', error);
-    }
+    await kickUserHandler(payload, io);
   });
 
   socket.on('user-want-voiting', async (payload) => {
-    try {
-      const { room, whoWillBeKicked } = payload;
-      const { userId: whoWillBeKickedUserId } = whoWillBeKicked;
-      const data = { room, whoWillBeKickedUserId };
-      const answer = await addNewKick(data, 'user-want-voiting');
-      const { kickId } = answer;
-      const newPayload = { ...payload, kickId };
-      socket.broadcast.emit('do-you-want-kick-user', newPayload);
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.log('error', error);
-      socket.emit('error', error);
-    }
+    const { room, whoWillBeKicked } = payload;
+    const { userId: whoWillBeKickedUserId } = whoWillBeKicked;
+    const respKick = await addNewKick(
+      'user-want-voiting',
+      room,
+      whoWillBeKickedUserId
+    );
+    console.log('user-want-voiting', respKick);
+
+    const { kickId } = respKick.data.kick;
+    respKick.data.kick = { ...payload, kickId };
+
+    socket.broadcast.to(room).emit('do-you-want-kick-user', respKick);
   });
 
   socket.on('kick-user-by-user', async (payload) => {
-    try {
-      const { room, whoWillBeKicked, kickId } = payload;
+    const { room, whoWillBeKicked, kickId } = payload;
 
-      const countUsersInRoom = await getUsersCount(room, 'kick-user-by-user');
+    const respCount = await getUsersCount('kick-user-by-user', room);
+    console.log('kick-user-by-user1', respCount);
 
-      const { countUsersWantedToKick } = await addVoiceToKickUser(
-        { kickId },
-        'kick-user-by-user'
-      );
-      if (countUsersWantedToKick > Math.ceil(countUsersInRoom / 2)) {
-        const kickPayload = {
-          room,
-          message: KICKED_BY_VOITING,
-          userId: whoWillBeKicked.userId,
-          firstName: whoWillBeKicked.firstName,
-          lastName: whoWillBeKicked.lastName,
-          role: whoWillBeKicked.role,
-        };
-        socket.emmit('kick-user', kickPayload);
-      }
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.log('error', error);
-      socket.emit('error', error);
+    const { count: countUsersInRoom } = respCount.data;
+
+    const respCountKick = await addVoiceToKickUser('kick-user-by-user', kickId);
+    console.log('kick-user-by-user2', respCountKick);
+
+    const { kick: countUsersWantedToKick } = respCountKick.data;
+
+    if (countUsersWantedToKick > Math.ceil(countUsersInRoom / 2)) {
+      const kickPayload = {
+        room,
+        message: KICKED_BY_VOITING,
+        userId: whoWillBeKicked.userId,
+        firstName: whoWillBeKicked.firstName,
+        lastName: whoWillBeKicked.lastName,
+        role: whoWillBeKicked.role,
+      };
+
+      await kickUserHandler(kickPayload, io);
     }
   });
 

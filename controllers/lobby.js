@@ -1,5 +1,4 @@
 const { STATUS_CODE } = require('../common/constants');
-const CustomError = require('../common/customError');
 const Kick = require('../models/Kick');
 const User = require('../models/User');
 const { createKick, updateKick } = require('../repositories/kick');
@@ -10,7 +9,7 @@ const {
   getAllUsers,
 } = require('../repositories/user');
 
-const getUsers = async (eventName, { room }, callback) => {
+const getUsers = async (eventName, room) => {
   const response = {
     eventName,
     code: 0,
@@ -21,7 +20,7 @@ const getUsers = async (eventName, { room }, callback) => {
   if (!room) {
     response.code = STATUS_CODE.BAD_REQUEST.CODE;
     response.error = `${STATUS_CODE.BAD_REQUEST.MESSAGE} room`;
-    return callback(response);
+    return response;
   }
 
   const allUsersInRoom = await getAllUsers(room);
@@ -29,67 +28,98 @@ const getUsers = async (eventName, { room }, callback) => {
   response.code = STATUS_CODE.OK.CODE;
   response.data.users = allUsersInRoom.map((user) => User.toResponse(user));
 
-  return callback(response);
+  return response;
 };
 
-const kickUser = async ({ room, userId }, eventName) => {
+const kickUser = async (eventName, { room, userId }) => {
+  const response = {
+    eventName,
+    code: 0,
+    error: '',
+    data: {},
+  };
   if (!room || !userId) {
-    throw new CustomError(
-      STATUS_CODE.BAD_REQUEST.CODE,
-      `${STATUS_CODE.BAD_REQUEST.MESSAGE} room, userId`,
-      eventName
-    );
+    response.code = STATUS_CODE.BAD_REQUEST.CODE;
+    response.error = `${STATUS_CODE.BAD_REQUEST.MESSAGE} room, userId`;
+    return response;
   }
   const kickedUser = await deleteUser(userId);
 
   if (!kickedUser) {
-    throw new CustomError(
-      STATUS_CODE.NOT_FOUND.CODE,
-      `Such user ${userId} ${STATUS_CODE.NOT_FOUND.MESSAGE}`,
-      eventName
-    );
-  } else {
-    await updateChat(room, userId);
-    return User.toResponse(kickedUser);
+    response.code = STATUS_CODE.NOT_FOUND.CODE;
+    response.error = `Such user ${userId} ${STATUS_CODE.NOT_FOUND.MESSAGE}`;
+    return response;
   }
+  await updateChat(room, userId);
+
+  response.code = STATUS_CODE.OK.CODE;
+  response.data.user = User.toResponse(kickedUser);
+  return response;
 };
 
-const addNewKick = async ({ room, whoWillBeKickedUserId }, eventName) => {
+const addNewKick = async (eventName, room, whoWillBeKickedUserId) => {
+  const response = {
+    eventName,
+    code: 0,
+    error: '',
+    data: {},
+  };
+
   if (!room || !whoWillBeKickedUserId) {
-    throw new CustomError(
-      STATUS_CODE.BAD_REQUEST.CODE,
-      `${STATUS_CODE.BAD_REQUEST.MESSAGE} room, whoWillBeKickedUserId`,
-      eventName
-    );
+    response.code = STATUS_CODE.BAD_REQUEST.CODE;
+    response.error = `${STATUS_CODE.BAD_REQUEST.MESSAGE}  room, whoWillBeKickedUserId`;
+    return response;
   }
   const newKick = await createKick(room, whoWillBeKickedUserId);
 
-  return Kick.toResponse(newKick);
+  response.code = STATUS_CODE.CREATED.CODE;
+  response.data.kick = Kick.toResponse(newKick);
+
+  return response;
 };
 
-const addVoiceToKickUser = async ({ kickId }, eventName) => {
+const addVoiceToKickUser = async (eventName, kickId) => {
+  const response = {
+    eventName,
+    code: 0,
+    error: '',
+    data: {},
+  };
+
   if (!kickId) {
-    throw new CustomError(
-      STATUS_CODE.BAD_REQUEST.CODE,
-      `${STATUS_CODE.BAD_REQUEST.MESSAGE} kickId`,
-      eventName
-    );
+    response.code = STATUS_CODE.BAD_REQUEST.CODE;
+    response.error = `${STATUS_CODE.BAD_REQUEST.MESSAGE} kickId`;
+    return response;
   }
+
   const updatedKick = await updateKick(kickId);
 
-  return Kick.toResponse(updatedKick);
+  response.code = STATUS_CODE.OK.CODE;
+  response.data.kick = Kick.toResponse(updatedKick);
+
+  return response;
 };
 
-const getUsersCount = async (room, eventName) => {
+const getUsersCount = async (eventName, room) => {
+  const response = {
+    eventName,
+    code: 0,
+    error: '',
+    data: {},
+  };
+
   if (!room) {
-    throw new CustomError(
-      STATUS_CODE.BAD_REQUEST.CODE,
-      `${STATUS_CODE.BAD_REQUEST.MESSAGE} room`,
-      eventName
-    );
+    response.code = STATUS_CODE.BAD_REQUEST.CODE;
+    response.error = `${STATUS_CODE.BAD_REQUEST.MESSAGE} room`;
+    return response;
   }
 
-  return getAllUsersCount(room);
+  const count = await getAllUsersCount(room);
+
+  response.code = STATUS_CODE.OK.CODE;
+  response.data.count = count;
+
+  return response;
 };
 
 module.exports = {

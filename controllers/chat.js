@@ -40,7 +40,7 @@ const saveMessage = async (eventName, message, type, room) => {
   return response;
 };
 
-const getChat = async (eventName, room, callback) => {
+const getChat = async (eventName, room) => {
   const response = {
     eventName,
     code: 0,
@@ -51,7 +51,7 @@ const getChat = async (eventName, room, callback) => {
   if (!room) {
     response.code = STATUS_CODE.BAD_REQUEST.CODE;
     response.error = `${STATUS_CODE.BAD_REQUEST.MESSAGE} room`;
-    return callback(response);
+    return response;
   }
 
   const allMessages = await getAll(room);
@@ -59,7 +59,7 @@ const getChat = async (eventName, room, callback) => {
   response.code = STATUS_CODE.OK.CODE;
   response.data.messages = allMessages.map((message) => Message.toResponse(message));
 
-  return callback(response);
+  return response;
 };
 
 module.exports = { saveMessage, getChat };

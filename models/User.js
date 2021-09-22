@@ -34,9 +34,9 @@ const userSchema = new Schema(
 );
 
 userSchema.statics.toResponse = (response) => {
-  const { _id, firstName, lastName, role, job, room, socketId } = response;
+  const { _id, firstName, lastName, role, job, room } = response;
   const userId = _id.toString();
-  return { userId, firstName, lastName, role, job, room, socketId };
+  return { userId, firstName, lastName, role, job, room };
 };
 
 module.exports = model('User', userSchema);
