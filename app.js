@@ -29,19 +29,6 @@ app.use(logInfo);
 io.on('connection', async (socket) => {
   console.log('A user connected');
 
-  // socket.on('login', async ({ user, room }, callback) => {
-  //   // console.log('socket.id', socket.id); // qA3oNINM_eNf36ldAAAD
-
-  //   await login('login', { user, room }, callback);
-
-  //   console.log('socket.rooms', socket.rooms); // { 'qA3oNINM_eNf36ldAAAD' }
-
-  //   // join user to room
-  //   socket.join(room);
-
-  //   console.log('socket.rooms', socket.rooms); // { 'qA3oNINM_eNf36ldAAAD', '123456789' }
-  // });
-
   socket.on('login', async ({ user, room }, callback) => {
     // console.log('socket.id', socket.id); // qA3oNINM_eNf36ldAAAD
 
@@ -69,7 +56,10 @@ io.on('connection', async (socket) => {
 
   socket.on('send-message', async (message, room, callback) => {
     const type = 'chat';
-    await saveMessage('send-message', message, type, room, callback);
+    const resp = await saveMessage('send-message', message, type, room);
+
+    callback(resp);
+    socket.broadcast.to(room).emit('get-message', resp);
   });
 
   socket.on('kick-user', async (payload) => {
