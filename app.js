@@ -102,8 +102,19 @@ io.on('connection', async (socket) => {
     console.log('kick-user-by-user2', respCountKick);
 
     const { kick: countUsersWantedToKick } = respCountKick.data;
+    // { countWantedToKick: 3, kickId: '614da2fd874b83fab6e84f5e' }
 
-    if (countUsersWantedToKick > Math.ceil(countUsersInRoom / 2)) {
+    console.log('countUsersWantedToKick', countUsersWantedToKick);
+    console.log('countUsersInRoom', countUsersInRoom);
+    console.log('halfRoom', Math.ceil(countUsersInRoom / 2));
+    console.log(
+      'isVoitedInafToKick',
+      countUsersWantedToKick > Math.ceil(countUsersInRoom / 2)
+    );
+
+    if (
+      countUsersWantedToKick.countWantedToKick >= Math.ceil(countUsersInRoom / 2)
+    ) {
       const kickPayload = {
         room,
         message: KICKED_BY_VOITING,
