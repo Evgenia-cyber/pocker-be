@@ -20,6 +20,7 @@ const {
 const { KICKED_BY_VOITING } = require('./common/constants');
 
 const kickUserHandler = require('./socket_events_handlers/kick_user_handler');
+const userExitHandler = require('./socket_events_handlers/user_exit_handler');
 
 app.use(cors());
 
@@ -123,6 +124,10 @@ io.on('connection', async (socket) => {
 
       await kickUserHandler(kickPayload, io);
     }
+  });
+
+  socket.on('user-exit', async (userId, room) => {
+    await userExitHandler(userId, room, io);
   });
 
   socket.on('disconnect', () => {
