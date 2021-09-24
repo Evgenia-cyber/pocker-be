@@ -3,29 +3,25 @@ const httpServer = require('http').createServer(app);
 const cors = require('cors');
 const io = require('socket.io')(httpServer);
 
-const logInfo = require('./middlewares/logs_handling');
-const {
-  catchAndLogErrors,
-  logError,
-} = require('./middlewares/errors_handling');
+const { logError } = require('./middlewares/errors_handling');
 
 const serverIsRunning = require('./middlewares/server_is_running');
 
 const { login } = require('./controllers/login');
 const { saveMessage, getChat } = require('./controllers/chat');
+
 const {
-  // kickUser,
   addNewKick,
   addVoiceToKickUser,
   getUsersCount,
   getUsers,
 } = require('./controllers/lobby');
+
 const { KICKED_BY_VOITING } = require('./common/constants');
+
 const kickUserHandler = require('./socket_events_handlers/kick_user_handler');
 
 app.use(cors());
-
-app.use(logInfo);
 
 io.on('connection', async (socket) => {
   console.log('A user connected');
@@ -113,7 +109,8 @@ io.on('connection', async (socket) => {
     );
 
     if (
-      countUsersWantedToKick.countWantedToKick >= Math.ceil(countUsersInRoom / 2)
+      countUsersWantedToKick.countWantedToKick
+      >= Math.ceil(countUsersInRoom / 2)
     ) {
       const kickPayload = {
         room,
@@ -134,8 +131,6 @@ io.on('connection', async (socket) => {
 });
 
 app.use('/', serverIsRunning);
-
-app.use(catchAndLogErrors);
 
 process.on('uncaughtException', (err, origin) => {
   logError(`Uncaught exception: ${err}. Exception origin: ${origin}`);
