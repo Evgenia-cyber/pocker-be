@@ -21,6 +21,7 @@ const { KICKED_BY_VOITING } = require('./common/constants');
 
 const kickUserHandler = require('./socket_events_handlers/kick_user_handler');
 const userExitHandler = require('./socket_events_handlers/user_exit_handler');
+const startGameHandler = require('./socket_events_handlers/start_game_handler');
 
 app.use(cors());
 
@@ -128,6 +129,10 @@ io.on('connection', async (socket) => {
 
   socket.on('user-exit', async (userId, room) => {
     await userExitHandler(userId, room, io);
+  });
+
+  socket.on('start-game', async (room, settings, issues, cards) => {
+    await startGameHandler('start-game', room, settings, issues, cards, io);
   });
 
   socket.on('disconnect', () => {
