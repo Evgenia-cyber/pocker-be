@@ -3,29 +3,28 @@ const httpServer = require('http').createServer(app);
 const cors = require('cors');
 const io = require('socket.io')(httpServer);
 
-const logInfo = require('./middlewares/logs_handling');
-const {
-  catchAndLogErrors,
-  logError,
-} = require('./middlewares/errors_handling');
+const { logError } = require('./middlewares/errors_handling');
 
 const serverIsRunning = require('./middlewares/server_is_running');
 
 const { login } = require('./controllers/login');
 const { saveMessage, getChat } = require('./controllers/chat');
+
 const {
-  // kickUser,
   addNewKick,
   addVoiceToKickUser,
   getUsersCount,
   getUsers,
 } = require('./controllers/lobby');
+
 const { KICKED_BY_VOITING } = require('./common/constants');
+
 const kickUserHandler = require('./socket_events_handlers/kick_user_handler');
+const userExitHandler = require('./socket_events_handlers/user_exit_handler');
+const startGameHandler = require('./socket_events_handlers/start_game_handler');
+const userCheckGameCardHandler = require('./socket_events_handlers/user_check_game_card_handler');
 
 app.use(cors());
-
-app.use(logInfo);
 
 io.on('connection', async (socket) => {
   console.log('A user connected');
@@ -102,8 +101,19 @@ io.on('connection', async (socket) => {
     console.log('kick-user-by-user2', respCountKick);
 
     const { kick: countUsersWantedToKick } = respCountKick.data;
+    // { countWantedToKick: 3, kickId: '614da2fd874b83fab6e84f5e' }
 
-    if (countUsersWantedToKick > Math.ceil(countUsersInRoom / 2)) {
+    console.log('countUsersWantedToKick', countUsersWantedToKick);
+    console.log('countUsersInRoom', countUsersInRoom);
+    console.log('halfRoom', Math.ceil(countUsersInRoom / 2));
+    console.log(
+      'isVoitedInafToKick',
+      countUsersWantedToKick > Math.ceil(countUsersInRoom / 2)
+    );
+
+    if (
+      countUsersWantedToKick.countWantedToKick >= Math.ceil(countUsersInRoom / 2)
+    ) {
       const kickPayload = {
         room,
         message: KICKED_BY_VOITING,
@@ -117,14 +127,32 @@ io.on('connection', async (socket) => {
     }
   });
 
+  socket.on('user-exit', async (userId, room) => {
+    await userExitHandler(userId, room, io);
+  });
+
+  socket.on('start-game', async (room, settings, issues, cards) => {
+    await startGameHandler('start-game', room, settings, issues, cards, io);
+  });
+
+  socket.on('user-check-game-card', async (room, userId, issueId, cardId, cardValue) => {
+    await userCheckGameCardHandler(
+      'user-check-game-card',
+      room,
+      userId,
+      issueId,
+      cardId,
+      cardValue,
+      io
+    );
+  });
+
   socket.on('disconnect', () => {
     console.log('A user disconnected');
   });
 });
 
 app.use('/', serverIsRunning);
-
-app.use(catchAndLogErrors);
 
 process.on('uncaughtException', (err, origin) => {
   logError(`Uncaught exception: ${err}. Exception origin: ${origin}`);
