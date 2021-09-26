@@ -22,6 +22,7 @@ const { KICKED_BY_VOITING } = require('./common/constants');
 const kickUserHandler = require('./socket_events_handlers/kick_user_handler');
 const userExitHandler = require('./socket_events_handlers/user_exit_handler');
 const startGameHandler = require('./socket_events_handlers/start_game_handler');
+const userCheckGameCardHandler = require('./socket_events_handlers/user_check_game_card_handler');
 
 app.use(cors());
 
@@ -111,8 +112,7 @@ io.on('connection', async (socket) => {
     );
 
     if (
-      countUsersWantedToKick.countWantedToKick
-      >= Math.ceil(countUsersInRoom / 2)
+      countUsersWantedToKick.countWantedToKick >= Math.ceil(countUsersInRoom / 2)
     ) {
       const kickPayload = {
         room,
@@ -133,6 +133,18 @@ io.on('connection', async (socket) => {
 
   socket.on('start-game', async (room, settings, issues, cards) => {
     await startGameHandler('start-game', room, settings, issues, cards, io);
+  });
+
+  socket.on('user-check-game-card', async (room, userId, issueId, cardId, cardValue) => {
+    await userCheckGameCardHandler(
+      'user-check-game-card',
+      room,
+      userId,
+      issueId,
+      cardId,
+      cardValue,
+      io
+    );
   });
 
   socket.on('disconnect', () => {
