@@ -23,6 +23,7 @@ const kickUserHandler = require('./socket_events_handlers/kick_user_handler');
 const userExitHandler = require('./socket_events_handlers/user_exit_handler');
 const startGameHandler = require('./socket_events_handlers/start_game_handler');
 const userCheckGameCardHandler = require('./socket_events_handlers/user_check_game_card_handler');
+const runRoundHandler = require('./socket_events_handlers/run_round_handler');
 
 app.use(cors());
 
@@ -135,16 +136,23 @@ io.on('connection', async (socket) => {
     await startGameHandler('start-game', room, settings, issues, cards, io);
   });
 
-  socket.on('user-check-game-card', async (room, userId, issueId, cardId, cardValue) => {
-    await userCheckGameCardHandler(
-      'user-check-game-card',
-      room,
-      userId,
-      issueId,
-      cardId,
-      cardValue,
-      io
-    );
+  socket.on(
+    'user-check-game-card',
+    async (room, userId, issueId, cardId, cardValue) => {
+      await userCheckGameCardHandler(
+        'user-check-game-card',
+        room,
+        userId,
+        issueId,
+        cardId,
+        cardValue,
+        io
+      );
+    }
+  );
+
+  socket.on('run-round', async (room, issueIdSelected) => {
+    await runRoundHandler('run-round', room, issueIdSelected, io);
   });
 
   socket.on('disconnect', () => {
