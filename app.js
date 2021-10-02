@@ -7,7 +7,6 @@ const { logError } = require('./middlewares/errors_handling');
 
 const serverIsRunning = require('./middlewares/server_is_running');
 
-const { login } = require('./controllers/login');
 const { saveMessage, getChat } = require('./controllers/chat');
 
 const {
@@ -27,6 +26,7 @@ const runRoundHandler = require('./socket_events_handlers/run_round_handler');
 const sendStatisticsHandler = require('./socket_events_handlers/send_statistics_handler');
 const showResultsHandler = require('./socket_events_handlers/show_results_handler');
 const removeRoomHandler = require('./socket_events_handlers/remove_room_handler');
+const loginHandler = require('./socket_events_handlers/login_handler');
 
 app.use(cors());
 
@@ -34,21 +34,7 @@ io.on('connection', async (socket) => {
   console.log('A user connected');
 
   socket.on('login', async ({ user, room }, callback) => {
-    // console.log('socket.id', socket.id); // qA3oNINM_eNf36ldAAAD
-
-    const resp = await login('login', { user, room });
-
-    console.log('login', resp);
-    // console.log('socket.rooms', socket.rooms); // { 'qA3oNINM_eNf36ldAAAD' }
-
-    // join user to room
-    socket.join(room);
-
-    // console.log('socket.rooms', socket.rooms); // { 'qA3oNINM_eNf36ldAAAD', '123456789' }
-
-    callback(resp);
-
-    socket.broadcast.to(room).emit('add-member', resp);
+    await loginHandler('login', room, user, callback, socket);
   });
 
   socket.on('get-all-users-in-room', async ({ room }, callback) => {

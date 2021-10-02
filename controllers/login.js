@@ -1,8 +1,8 @@
 const { STATUS_CODE } = require('../common/constants');
 const User = require('../models/User');
-const { createUser } = require('../repositories/user');
+const { createUser, findRoom } = require('../repositories/user');
 
-const login = async (eventName, { user, room }) => {
+const login = async (eventName, user, room) => {
   const response = {
     eventName,
     code: 0,
@@ -16,6 +16,16 @@ const login = async (eventName, { user, room }) => {
     response.code = STATUS_CODE.BAD_REQUEST.CODE;
     response.error = `${STATUS_CODE.BAD_REQUEST.MESSAGE} firstName, role, room, userId`;
     return response;
+  }
+
+  if (role !== 'admin') {
+    const findRoomResp = await findRoom(room);
+
+    if (!findRoomResp) {
+      response.code = STATUS_CODE.NOT_FOUND.CODE;
+      response.error = `room ${room} ${STATUS_CODE.NOT_FOUND.MESSAGE}`;
+      return response;
+    }
   }
 
   const newUser = await createUser(user, room);

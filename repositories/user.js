@@ -23,4 +23,13 @@ const getAllUsers = async (room) => User.find({ room });
 
 const removeAllUsers = async (room) => User.deleteMany({ room });
 
-module.exports = { createUser, deleteUser, getAllUsersCount, getAllUsers, removeAllUsers };
+const findRoom = async (room) => User.findOne({ room });
+
+module.exports = {
+  createUser,
+  deleteUser,
+  getAllUsersCount,
+  getAllUsers,
+  removeAllUsers,
+  findRoom,
+};
