@@ -87,6 +87,7 @@ const removeRoom = async (eventName, room) => {
   await removeAllUsers(room);
   await removeAllVotes(room);
 
+  response.code = STATUS_CODE.DELETED.CODE;
   return response;
 };
 

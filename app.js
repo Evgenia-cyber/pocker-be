@@ -27,6 +27,7 @@ const sendStatisticsHandler = require('./socket_events_handlers/send_statistics_
 const showResultsHandler = require('./socket_events_handlers/show_results_handler');
 const removeRoomHandler = require('./socket_events_handlers/remove_room_handler');
 const loginHandler = require('./socket_events_handlers/login_handler');
+const cancelGameHandler = require('./socket_events_handlers/cancel_game_handler');
 
 app.use(cors());
 
@@ -163,6 +164,10 @@ io.on('connection', async (socket) => {
 
   socket.on('delete-room', async (room, callback) => {
     await removeRoomHandler('delete-room', room, callback);
+  });
+
+  socket.on('cancel-game', async (room) => {
+    await cancelGameHandler('cancel-game', room, io);
   });
 
   socket.on('disconnect', () => {
