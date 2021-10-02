@@ -126,6 +126,11 @@ io.on('connection', async (socket) => {
     await startGameHandler('start-game', room, settings, issues, cards, io);
   });
 
+  socket.on('add-later-in-game', async (room, settings, issues, cards, lateUser) => {
+    await startGameHandler('add-later-in-game', room, settings, issues, cards, io);
+    io.in(room).emit('admin-added-later-in-game', lateUser);
+  });
+
   socket.on(
     'user-check-game-card',
     async (room, userId, issueId, cardId, cardValue) => {

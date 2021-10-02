@@ -1,5 +1,6 @@
 const { STATUS_CODE } = require('../common/constants');
 const User = require('../models/User');
+const { findGame } = require('../repositories/game');
 const { createUser, findRoom } = require('../repositories/user');
 
 const login = async (eventName, user, room) => {
@@ -25,6 +26,14 @@ const login = async (eventName, user, room) => {
       response.code = STATUS_CODE.NOT_FOUND.CODE;
       response.error = `room ${room} ${STATUS_CODE.NOT_FOUND.MESSAGE}`;
       return response;
+    }
+
+    const game = await findGame(room);
+
+    if (game) {
+      response.data.isLate = true;
+    } else {
+      response.data.isLate = false;
     }
   }
 

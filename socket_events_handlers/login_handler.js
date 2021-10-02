@@ -5,15 +5,20 @@ const loginHandler = async (eventName, room, user, callback, socket) => {
 
   console.log('login', resp);
 
-  const { error } = resp;
+  const { error, data } = resp;
+
+  const { isLate } = data;
 
   if (!error) {
     // join user to room
     socket.join(room);
 
     callback(resp);
-
-    socket.broadcast.to(room).emit('add-member', resp);
+    if (isLate) {
+      socket.broadcast.to(room).emit('late-user-logged-in', resp);
+    } else {
+      socket.broadcast.to(room).emit('add-member', resp);
+    }
   } else {
     callback(resp);
   }
