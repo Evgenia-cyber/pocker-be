@@ -10,11 +10,19 @@ const createResult = async (room, issueId, results) => {
   return resultModel.save();
 };
 
-const updateResult = async (room, issueId, results) => Result.findOneAndUpdate({ room, issueId },
-  { results }, { new: true });
+const updateResult = async (room, issueId, results) => Result
+  .findOneAndUpdate({ room, issueId }, { results }, { new: true });
 
 const findResult = async (room, issueId) => Result.findOne({ room, issueId });
 
 const getAllResults = async (room) => Result.find({ room });
 
-module.exports = { findResult, getAllResults, createResult, updateResult };
+const removeAllResults = async (room) => Result.deleteMany({ room });
+
+module.exports = {
+  findResult,
+  getAllResults,
+  createResult,
+  updateResult,
+  removeAllResults,
+};

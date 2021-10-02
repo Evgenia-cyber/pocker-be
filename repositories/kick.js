@@ -15,4 +15,6 @@ const updateKick = async (kickId) => Kick.findByIdAndUpdate(
   { new: true }
 );
 
-module.exports = { createKick, updateKick };
+const removeAllKicks = async (room) => Kick.deleteMany({ room });
+
+module.exports = { createKick, updateKick, removeAllKicks };

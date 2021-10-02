@@ -1,11 +1,17 @@
 const { STATUS_CODE } = require('../common/constants');
 const Result = require('../models/Result');
+const { removeAllGames } = require('../repositories/game');
+const { removeAllKicks } = require('../repositories/kick');
+const { removeAllMessages } = require('../repositories/message');
 const {
   createResult,
   updateResult,
   findResult,
   getAllResults,
+  removeAllResults,
 } = require('../repositories/result');
+const { removeAllUsers } = require('../repositories/user');
+const { removeAllVotes } = require('../repositories/vote');
 
 const saveResult = async (eventName, room, issueId, results) => {
   const response = {
@@ -60,4 +66,28 @@ const getStatistics = async (eventName, room) => {
   return response;
 };
 
-module.exports = { saveResult, getStatistics };
+const removeRoom = async (eventName, room) => {
+  const response = {
+    eventName,
+    code: 0,
+    error: '',
+    data: {},
+  };
+
+  if (!room) {
+    response.code = STATUS_CODE.BAD_REQUEST.CODE;
+    response.error = `${STATUS_CODE.BAD_REQUEST.MESSAGE} room, issueId, results`;
+    return response;
+  }
+
+  await removeAllGames(room);
+  await removeAllKicks(room);
+  await removeAllMessages(room);
+  await removeAllResults(room);
+  await removeAllUsers(room);
+  await removeAllVotes(room);
+
+  return response;
+};
+
+module.exports = { saveResult, getStatistics, removeRoom };

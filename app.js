@@ -26,6 +26,7 @@ const userCheckGameCardHandler = require('./socket_events_handlers/user_check_ga
 const runRoundHandler = require('./socket_events_handlers/run_round_handler');
 const sendStatisticsHandler = require('./socket_events_handlers/send_statistics_handler');
 const showResultsHandler = require('./socket_events_handlers/show_results_handler');
+const removeRoomHandler = require('./socket_events_handlers/remove_room_handler');
 
 app.use(cors());
 
@@ -172,6 +173,10 @@ io.on('connection', async (socket) => {
 
   socket.on('show-results', async (room) => {
     await showResultsHandler('show-results', room, io);
+  });
+
+  socket.on('delete-room', async (room, callback) => {
+    await removeRoomHandler('delete-room', room, callback);
   });
 
   socket.on('disconnect', () => {

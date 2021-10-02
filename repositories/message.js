@@ -30,4 +30,6 @@ const updateChat = async (room, kickedUserId) => Message.updateMany(
 
 const getAll = async (room) => Message.find({ room });
 
-module.exports = { createMessage, updateChat, getAll };
+const removeAllMessages = async (room) => Message.deleteMany({ room });
+
+module.exports = { createMessage, updateChat, getAll, removeAllMessages };
