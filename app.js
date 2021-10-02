@@ -7,7 +7,6 @@ const { logError } = require('./middlewares/errors_handling');
 
 const serverIsRunning = require('./middlewares/server_is_running');
 
-const { login } = require('./controllers/login');
 const { saveMessage, getChat } = require('./controllers/chat');
 
 const {
@@ -24,6 +23,11 @@ const userExitHandler = require('./socket_events_handlers/user_exit_handler');
 const startGameHandler = require('./socket_events_handlers/start_game_handler');
 const userCheckGameCardHandler = require('./socket_events_handlers/user_check_game_card_handler');
 const runRoundHandler = require('./socket_events_handlers/run_round_handler');
+const sendStatisticsHandler = require('./socket_events_handlers/send_statistics_handler');
+const showResultsHandler = require('./socket_events_handlers/show_results_handler');
+const removeRoomHandler = require('./socket_events_handlers/remove_room_handler');
+const loginHandler = require('./socket_events_handlers/login_handler');
+const cancelGameHandler = require('./socket_events_handlers/cancel_game_handler');
 
 app.use(cors());
 
@@ -31,21 +35,7 @@ io.on('connection', async (socket) => {
   console.log('A user connected');
 
   socket.on('login', async ({ user, room }, callback) => {
-    // console.log('socket.id', socket.id); // qA3oNINM_eNf36ldAAAD
-
-    const resp = await login('login', { user, room });
-
-    console.log('login', resp);
-    // console.log('socket.rooms', socket.rooms); // { 'qA3oNINM_eNf36ldAAAD' }
-
-    // join user to room
-    socket.join(room);
-
-    // console.log('socket.rooms', socket.rooms); // { 'qA3oNINM_eNf36ldAAAD', '123456789' }
-
-    callback(resp);
-
-    socket.broadcast.to(room).emit('add-member', resp);
+    await loginHandler('login', room, user, callback, socket);
   });
 
   socket.on('get-all-users-in-room', async ({ room }, callback) => {
@@ -136,6 +126,11 @@ io.on('connection', async (socket) => {
     await startGameHandler('start-game', room, settings, issues, cards, io);
   });
 
+  socket.on('add-later-in-game', async (room, settings, issues, cards, lateUser) => {
+    await startGameHandler('add-later-in-game', room, settings, issues, cards, io);
+    io.in(room).emit('admin-added-later-in-game', lateUser);
+  });
+
   socket.on(
     'user-check-game-card',
     async (room, userId, issueId, cardId, cardValue) => {
@@ -153,6 +148,31 @@ io.on('connection', async (socket) => {
 
   socket.on('run-round', async (room, issueIdSelected) => {
     await runRoundHandler('run-round', room, issueIdSelected, io);
+  });
+
+  socket.on(
+    'send-statistics',
+    async (room, issueIdSelected, statisticsCards, callback) => {
+      await sendStatisticsHandler(
+        'send-statistics',
+        room,
+        issueIdSelected,
+        statisticsCards,
+        callback
+      );
+    }
+  );
+
+  socket.on('show-results', async (room) => {
+    await showResultsHandler('show-results', room, io);
+  });
+
+  socket.on('delete-room', async (room, callback) => {
+    await removeRoomHandler('delete-room', room, callback);
+  });
+
+  socket.on('cancel-game', async (room) => {
+    await cancelGameHandler('cancel-game', room, io);
   });
 
   socket.on('disconnect', () => {

@@ -11,4 +11,8 @@ const createGame = async (room, settings, issues, cards) => {
   return gameModel.save();
 };
 
-module.exports = { createGame };
+const removeAllGames = async (room) => Game.deleteMany({ room });
+
+const findGame = async (room) => Game.findOne({ room });
+
+module.exports = { createGame, removeAllGames, findGame };

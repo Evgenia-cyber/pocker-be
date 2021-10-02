@@ -12,4 +12,6 @@ const createVote = async (room, userId, issueId, cardId, cardValue) => {
   return voteModel.save();
 };
 
-module.exports = { createVote };
+const removeAllVotes = async (room) => Vote.deleteMany({ room });
+
+module.exports = { createVote, removeAllVotes };

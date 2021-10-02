@@ -21,4 +21,15 @@ const getAllUsersCount = async (room) => User.countDocuments({ room });
 
 const getAllUsers = async (room) => User.find({ room });
 
-module.exports = { createUser, deleteUser, getAllUsersCount, getAllUsers };
+const removeAllUsers = async (room) => User.deleteMany({ room });
+
+const findRoom = async (room) => User.findOne({ room });
+
+module.exports = {
+  createUser,
+  deleteUser,
+  getAllUsersCount,
+  getAllUsers,
+  removeAllUsers,
+  findRoom,
+};
