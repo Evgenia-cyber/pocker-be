@@ -4,6 +4,7 @@ const {
   createResult,
   updateResult,
   findResult,
+  getAllResults,
 } = require('../repositories/result');
 
 const saveResult = async (eventName, room, issueId, results) => {
@@ -37,4 +38,26 @@ const saveResult = async (eventName, room, issueId, results) => {
   return response;
 };
 
-module.exports = { saveResult };
+const getStatistics = async (eventName, room) => {
+  const response = {
+    eventName,
+    code: 0,
+    error: '',
+    data: {},
+  };
+
+  if (!room) {
+    response.code = STATUS_CODE.BAD_REQUEST.CODE;
+    response.error = `${STATUS_CODE.BAD_REQUEST.MESSAGE} room`;
+    return response;
+  }
+
+  const allResults = await getAllResults(room);
+
+  response.code = STATUS_CODE.OK.CODE;
+  response.data.statistics = allResults.map((result) => Result.toResponse(result));
+
+  return response;
+};
+
+module.exports = { saveResult, getStatistics };
