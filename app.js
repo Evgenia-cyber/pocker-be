@@ -24,6 +24,7 @@ const userExitHandler = require('./socket_events_handlers/user_exit_handler');
 const startGameHandler = require('./socket_events_handlers/start_game_handler');
 const userCheckGameCardHandler = require('./socket_events_handlers/user_check_game_card_handler');
 const runRoundHandler = require('./socket_events_handlers/run_round_handler');
+const sendStatisticsHandler = require('./socket_events_handlers/send_statistics_handler');
 
 app.use(cors());
 
@@ -113,7 +114,8 @@ io.on('connection', async (socket) => {
     );
 
     if (
-      countUsersWantedToKick.countWantedToKick >= Math.ceil(countUsersInRoom / 2)
+      countUsersWantedToKick.countWantedToKick
+      >= Math.ceil(countUsersInRoom / 2)
     ) {
       const kickPayload = {
         room,
@@ -154,6 +156,19 @@ io.on('connection', async (socket) => {
   socket.on('run-round', async (room, issueIdSelected) => {
     await runRoundHandler('run-round', room, issueIdSelected, io);
   });
+
+  socket.on(
+    'send-statistics',
+    async (room, issueIdSelected, statisticsCards, callback) => {
+      await sendStatisticsHandler(
+        'send-statistics',
+        room,
+        issueIdSelected,
+        statisticsCards,
+        callback
+      );
+    }
+  );
 
   socket.on('disconnect', () => {
     console.log('A user disconnected');
