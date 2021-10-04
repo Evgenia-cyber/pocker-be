@@ -28,6 +28,7 @@ const showResultsHandler = require('./socket_events_handlers/show_results_handle
 const removeRoomHandler = require('./socket_events_handlers/remove_room_handler');
 const loginHandler = require('./socket_events_handlers/login_handler');
 const cancelGameHandler = require('./socket_events_handlers/cancel_game_handler');
+const stopRoundHandler = require('./socket_events_handlers/stop_round_handler');
 
 app.use(cors());
 
@@ -126,10 +127,20 @@ io.on('connection', async (socket) => {
     await startGameHandler('start-game', room, settings, issues, cards, io);
   });
 
-  socket.on('add-later-in-game', async (room, settings, issues, cards, lateUser) => {
-    await startGameHandler('add-later-in-game', room, settings, issues, cards, io);
-    io.in(room).emit('admin-added-later-in-game', lateUser);
-  });
+  socket.on(
+    'add-later-in-game',
+    async (room, settings, issues, cards, lateUser) => {
+      await startGameHandler(
+        'add-later-in-game',
+        room,
+        settings,
+        issues,
+        cards,
+        io
+      );
+      io.in(room).emit('admin-added-later-in-game', lateUser);
+    }
+  );
 
   socket.on(
     'user-check-game-card',
@@ -148,6 +159,10 @@ io.on('connection', async (socket) => {
 
   socket.on('run-round', async (room, issueIdSelected) => {
     await runRoundHandler('run-round', room, issueIdSelected, io);
+  });
+
+  socket.on('stop-round', async (room) => {
+    await stopRoundHandler('stop-round', room, socket);
   });
 
   socket.on(
